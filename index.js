@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, MongoRuntimeError } = require("mongodb");
 require("dotenv").config();
 
 // middle wares
@@ -16,11 +16,19 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
+async function run() {
+  try {
+    const categoryCollection = client.db("rentCar").collection("categories");
+    app.get("/categories", async (req, res) => {
+      const query = {};
+      const cursor = categoryCollection.find(query);
+      const category = await cursor.toArray();
+      res.send(category);
+    });
+  } finally {
+  }
+}
+run().catch((err) => console.error(err));
 
 app.get("/", (req, res) => {
   res.send("Car rental server is running");
