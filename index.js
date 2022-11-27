@@ -2,7 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion, MongoRuntimeError } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  MongoRuntimeError,
+  ObjectId,
+} = require("mongodb");
 require("dotenv").config();
 
 // middle wares
@@ -19,10 +24,19 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const categoryCollection = client.db("rentCar").collection("categories");
+    const bookingCollection = client.db("rentCar").collection("bookings");
     app.get("/categories", async (req, res) => {
       const query = {};
       const cursor = categoryCollection.find(query);
       const category = await cursor.toArray();
+      res.send(category);
+    });
+
+    app.get("/categories/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const category = await categoryCollection.findOne(query);
+
       res.send(category);
     });
   } finally {
