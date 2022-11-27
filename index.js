@@ -5,7 +5,7 @@ const port = process.env.PORT || 5000;
 const {
   MongoClient,
   ServerApiVersion,
-  MongoRuntimeError,
+
   ObjectId,
 } = require("mongodb");
 require("dotenv").config();
@@ -39,6 +39,13 @@ async function run() {
 
       res.send(category);
     });
+
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      console.log(booking);
+      const result = await bookingCollection.insertOne(booking);
+      res.send(result);
+    });
   } finally {
   }
 }
@@ -49,5 +56,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Genious car server is running on${port}`);
+  console.log(`Genious car server is running on ${port}`);
 });
