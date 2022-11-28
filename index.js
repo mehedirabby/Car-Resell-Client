@@ -8,7 +8,9 @@ const {
 
   ObjectId,
 } = require("mongodb");
+
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 // middle wares
 app.use(cors());
@@ -25,6 +27,7 @@ async function run() {
   try {
     const categoryCollection = client.db("rentCar").collection("categories");
     const bookingCollection = client.db("rentCar").collection("bookings");
+    const usersCollection = client.db("rentCar").collection("users");
     app.get("/categories", async (req, res) => {
       const query = {};
       const cursor = categoryCollection.find(query);
@@ -56,6 +59,12 @@ async function run() {
       const cursor = bookingCollection.find(query);
       const bookings = await cursor.toArray();
       res.send(bookings);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
     });
   } finally {
   }
