@@ -56,9 +56,41 @@ async function run() {
           email: req.query.email,
         };
       }
+
       const cursor = bookingCollection.find(query);
       const bookings = await cursor.toArray();
       res.send(bookings);
+    });
+
+    app.delete("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await bookingCollection.deleteOne(query);
+      res.send(result);
+    });
+    app.patch("bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const status = req.body.status;
+      const updateDoc = {
+        $Set: {
+          status: status,
+        },
+      };
+      const result = await bookingCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+    app.get("/jwt", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      if (user) {
+        const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
+          expiresIn: "1h",
+        });
+        return res.send({ accessToken: token });
+      }
+      res.status(403).send({ accessToken: "403" });
     });
 
     app.post("/users", async (req, res) => {
