@@ -84,19 +84,38 @@ async function run() {
       const email = req.query.email;
       const query = { email: email };
       const user = await usersCollection.findOne(query);
+      console.log(user);
       if (user) {
         const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
           expiresIn: "1h",
         });
         return res.send({ accessToken: token });
+      } else {
+        res.status(403).send({ accessToken: "403" });
       }
-      res.status(403).send({ accessToken: "403" });
     });
 
     app.post("/users", async (req, res) => {
       const user = req.body;
+      console.log(user);
       const result = await usersCollection.insertOne(user);
       res.send(result);
+    });
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const users = await usersCollection.find(query).toArray();
+      res.send(users);
+    });
+    app.put("/users/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+
+      const updateDoc = {
+        $Set: {
+          role: "admin",
+        },
+      };
     });
   } finally {
   }
