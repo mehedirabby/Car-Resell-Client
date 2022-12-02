@@ -175,5 +175,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Genious car server is running on ${port}`);
+  console.log(`Resell car server is running on ${port}`);
 });
